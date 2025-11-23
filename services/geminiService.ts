@@ -18,21 +18,25 @@ export const generateWindowDesign = async (
       
       Task:
       1. Analyze the provided image of a window.
-      2. Identify the **window frame and sash** (the structural borders holding the glass).
-      3. Simulate applying a **custom magnetic cover** to these frame parts.
-      4. The cover design parameters are:
-         - **Base Tone/Color**: ${colorName}
-         - **Surface Design/Texture**: ${texturePrompt}
+      2. Identify the **moving sashes (ante)** and the **fixed outer frame (telaio)** attached to the wall.
+      3. Simulate applying a **custom magnetic cover** ONLY to the moving sashes (ante).
+      4. **DO NOT** apply the cover to the fixed outer frame (telaio). The outer frame must remain in its original color (usually white or neutral).
+      
+      The cover design parameters are:
+      - **Base Tone/Color**: ${colorName}
+      - **Surface Design/Texture**: ${texturePrompt}
       
       Instructions for "Surface Design":
       - If the design is a material (like wood, PVC), make it look realistic.
-      - If the design is an **Artistic Pattern** (like Giotto, Fresco, Mosaic), apply it as a **high-quality graphic print** wrapped onto the frame.
+      - If the design is an **Artistic Pattern** (like Giotto, Fresco, Mosaic), apply it as a **high-quality graphic print** wrapped onto the sash profiles.
       
-      IMPORTANT CONSTRAINT: 
+      IMPORTANT CONSTRAINTS: 
+      - **Apply cover ONLY to the sashes (ante)**.
+      - **Keep the fixed frame (telaio) ORIGINAL**.
       - **Keep the glass transparent**. Do NOT cover the view through the window.
       - **Keep the handle visible** (either metallic or color-matched, but distinct).
       - Maintain original lighting and perspective.
-      - The result must look like a physical product applied to the window frame.
+      - The result must look like a physical product applied specifically to the opening parts of the window.
       
       Output: A high-resolution photorealistic image.
     `;

@@ -38,7 +38,7 @@ export const createSyntheticWindowImage = (): string => {
   ctx.fillRect(wX, wY, wWidth, wHeight);
   ctx.restore();
 
-  // === OUTER FRAME ===
+  // === OUTER FRAME (TELAIO FISSO) ===
   const frameWidth = 40;
   ctx.fillStyle = '#fdfdfd'; // Pure white PVC
   ctx.fillRect(wX, wY, wWidth, wHeight);
@@ -48,38 +48,48 @@ export const createSyntheticWindowImage = (): string => {
   ctx.lineWidth = 1;
   ctx.strokeRect(wX, wY, wWidth, wHeight);
 
-  // Inner recess of the frame
+  // Inner recess of the frame (separation between Frame and Sash)
   const innerX = wX + frameWidth;
   const innerY = wY + frameWidth;
   const innerW = wWidth - (frameWidth * 2);
   const innerH = wHeight - (frameWidth * 2);
   
-  ctx.fillStyle = '#f1f5f9'; // Slightly darker recess
+  // Slightly darker recess to distinguish from Sash
+  ctx.fillStyle = '#e2e8f0'; 
   ctx.fillRect(innerX, innerY, innerW, innerH);
   ctx.strokeRect(innerX, innerY, innerW, innerH);
 
-  // === SASHES (Ante) ===
+  // === SASHES (ANTE MOBILI) ===
   const sashGap = 4; // Gap between sashes in the middle
-  const centralPostWidth = 0; // Modern windows often overlap
   const sashW = (innerW - sashGap) / 2;
   const sashH = innerH - 6; // Small gap top/bottom
   
-  const drawSash = (x: number, y: number, handleSide: 'left' | 'right') => {
+  const drawSash = (x: number, y: number, handleSide: 'left' | 'right', hasHandle: boolean) => {
     // Sash Frame Material
     const sashFrameSize = 45;
     
-    // Main Sash Body
+    // Shadow behind sash to make it pop from frame
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.1)';
+    ctx.shadowBlur = 4;
+    ctx.shadowOffsetY = 1;
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(x, y, sashW, sashH);
+    ctx.restore();
     
-    // Sash Border/Bevel
-    ctx.strokeStyle = '#cbd5e1';
+    // Sash Border/Bevel - Outer dark seal (guarnizione)
+    ctx.strokeStyle = '#94a3b8'; // Darker grey for seal
     ctx.lineWidth = 1;
     ctx.strokeRect(x, y, sashW, sashH);
     
+    // Sash Inner Body
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(x + 1, y + 1, sashW - 2, sashH - 2);
+
     // Miter joints (Diagonal lines at corners)
     ctx.beginPath();
     ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1;
     ctx.moveTo(x, y);
     ctx.lineTo(x + sashFrameSize, y + sashFrameSize);
     ctx.moveTo(x + sashW, y);
@@ -123,41 +133,43 @@ export const createSyntheticWindowImage = (): string => {
     ctx.fill();
     ctx.restore();
 
-    // Handle
-    const handleY = y + (sashH / 2);
-    const handleX = handleSide === 'left' ? x + sashW - 25 : x + 25;
-    
-    // Handle Escutcheon (Base)
-    ctx.fillStyle = '#cbd5e1'; // Silver/Grey
-    ctx.fillRect(handleX - 8, handleY - 30, 16, 60);
-    
-    // Handle Grip
-    ctx.strokeStyle = '#94a3b8'; // Darker silver
-    ctx.lineWidth = 12;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.beginPath();
-    ctx.moveTo(handleX, handleY - 10);
-    ctx.lineTo(handleX, handleY + 10);
-    // Grip direction
-    ctx.lineTo(handleX + (handleSide === 'left' ? -50 : 50), handleY + 10);
-    ctx.stroke();
+    if (hasHandle) {
+      // Handle
+      const handleY = y + (sashH / 2);
+      const handleX = handleSide === 'left' ? x + sashW - 25 : x + 25;
+      
+      // Handle Escutcheon (Base)
+      ctx.fillStyle = '#cbd5e1'; // Silver/Grey
+      ctx.fillRect(handleX - 8, handleY - 30, 16, 60);
+      
+      // Handle Grip
+      ctx.strokeStyle = '#94a3b8'; // Darker silver
+      ctx.lineWidth = 12;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(handleX, handleY - 10);
+      ctx.lineTo(handleX, handleY + 10);
+      // Grip direction
+      ctx.lineTo(handleX + (handleSide === 'left' ? -50 : 50), handleY + 10);
+      ctx.stroke();
 
-    // Handle Highlight
-    ctx.strokeStyle = '#f1f5f9'; // Lighter silver
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(handleX, handleY - 10);
-    ctx.lineTo(handleX, handleY + 8);
-    ctx.lineTo(handleX + (handleSide === 'left' ? -48 : 48), handleY + 8);
-    ctx.stroke();
+      // Handle Highlight
+      ctx.strokeStyle = '#f1f5f9'; // Lighter silver
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(handleX, handleY - 10);
+      ctx.lineTo(handleX, handleY + 8);
+      ctx.lineTo(handleX + (handleSide === 'left' ? -48 : 48), handleY + 8);
+      ctx.stroke();
+    }
   };
 
-  // Draw Left Sash
-  drawSash(innerX + 2, innerY + 3, 'left');
+  // Draw Left Sash (NO HANDLE)
+  drawSash(innerX + 2, innerY + 3, 'left', false);
   
-  // Draw Right Sash
-  drawSash(innerX + sashW + sashGap - 2, innerY + 3, 'right');
+  // Draw Right Sash (YES HANDLE)
+  drawSash(innerX + sashW + sashGap - 2, innerY + 3, 'right', true);
   
   // === SILL (Davanzale) ===
   const sillY = wY + wHeight;
